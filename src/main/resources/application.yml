@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    data-username: root
+    data-password: 123456
+    url: jdbc:mysql://localhost:3306/test?useSSL=false
+    hikari:
+      driver-class-name: com.mysql.jdbc.Driver
+  application:
+    name: crud
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
+  mvc:
+    favicon:
+      enabled: false
+  aop:
+    proxy-target-class: true
+  freemarker:
+    template-loader-path: ["classpath:/templates/", "classpath:/castemplates/"]
+server:
+   port: 8080
+   compression:
+     enabled: true
+   use-forward-headers: true
+mybatis:
+   configuration:
+      cache-enabled: true
+      lazy-loading-enabled: true
+      aggressive-lazy-loading: false
+      multiple-result-sets-enabled: true
+      use-column-label: true
+      auto-mapping-behavior: full
+      default-statement-timeout: 2000
+      map-underscore-to-camel-case: true
+  #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    mapper-locations:
+      classpath*:mapper/**/*Mapper.xml
+
+  pagehelper:
+    helper-dialect: mysql
