@@ -32,7 +32,7 @@
         <!-- 标题 -->
         <div class="row">
             <div class="col-md-12">
-                <h1>学生信息管理</h1>
+                <h1>用户信息管理</h1>
             </div>
         </div>
         <!-- 按钮 -->
@@ -40,7 +40,7 @@
             <div class="col-md-3 col-md-offset-4">
                 <div class="input-group">
                     <input type="text" class="form-control" id="user_select_input"
-                           placeholder="请输入学生姓名" v-model="searchInfo.name">
+                           placeholder="请输入用户名" v-model="searchInfo.name">
                     <span class="input-group-btn">
                		<button class="btn btn-info btn-search" id="user_select_btn" @click="search">查找</button>
                     </span>
@@ -56,8 +56,8 @@
                         <th>#</th>
                         <th>用户名</th>
                         <th>年龄</th>
+                        <th>性别</th>
                         <th>电话</th>
-                        <th>地址</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -66,11 +66,10 @@
                         <td>{{user.id}}</td>
                         <td>{{user.name}}</td>
                         <td>{{user.age}}</td>
-                        <td>{{user.phone}}</td>
-                        <td>{{user.address}}</td>
+                        <td>{{user.gender}}</td>
+                        <td>{{user.mobile}}</td>
                         <td>
-                            <button class="updata_user_btn" class="btn btn-info"
-                                    class="btn btn-sm btn-primary">
+                            <button class="updata_user_btn" class="btn btn-sm btn-primary">
                                 <span class="glyphicon glyphicon-pencil" @click = "updateUser(user)">修改</span>
                             </button>
                             <button class="delete_user_btn" class="btn btn-sm btn-danger">
@@ -87,9 +86,8 @@
                             </div>
                         </td>
                         <td>
-                            <button class="insert_user_btn" @click = "insertUser(user)"
-                                    class="btn btn-sm btn-primary">
-                                <span class="glyphicon glyphicon-pencil">添加</span>
+                            <button class="insert_user_btn"class="btn btn-sm btn-primary">
+                                <span class="glyphicon glyphicon-pencil"@click = "insertUser()">添加</span>
                             </button>
                         </td>
                     </tr>
@@ -102,21 +100,21 @@
             <div >
                 <tr>
                     <label>姓名：</label>
-                    <input type="text"  v-model="updateInfo.name">
+                    <input type="text" id="name" v-model="updateInfo.name">
                 </tr>
                 <tr>
                     <label>年龄：</label>
-                    <input type="text"  v-model="updateInfo.age">
+                    <input type="text" id="age" v-model="updateInfo.age">
+                </tr>
+                <tr>
+                    <label>性别：</label>
+                    <input type="text" id="gender"  v-model="updateInfo.gender">
                 </tr>
                 <tr>
                     <label>电话：</label>
-                    <input type="text"   v-model="updateInfo.phone">
+                    <input type="text" id="mobile"  v-model="updateInfo.mobile">
                 </tr>
-                <tr>
-                    <label>地址：</label>
-                    <input type="text"   v-model="updateInfo.address">
-                </tr>
-                <button  v-on:click = "updatedUser()">完成</button>
+                <button  @click = "updatedUser(updateInfo)">完成</button>
             </div>
         </div>
 
@@ -125,21 +123,21 @@
             <div >
                 <tr>
                     <label>姓名：</label>
-                    <input type="text" v-model="insertInfo.name">
+                    <input type="text" id="name" v-model="insertInfo.name">
                 </tr>
                 <tr>
                     <label>年龄：</label>
-                    <input type="text" v-model="insertInfo.age">
+                    <input type="text" id="age" v-model="insertInfo.age">
+                </tr>
+                <tr>
+                    <label>性别：</label>
+                    <input type="text"  id="gender" v-model="insertInfo.gender">
                 </tr>
                 <tr>
                     <label>电话：</label>
-                    <input type="text"  v-model="insertInfo.phone">
+                    <input type="text"  id="mobile" v-model="insertInfo.mobile">
                 </tr>
-                <tr>
-                    <label>地址：</label>
-                    <input type="text"  v-model="insertInfo.address">
-                </tr>
-                <button   v-on:click = "insertedUser()">完成</button>
+                <button   @click = "insertedUser(insertInfo)">完成</button>
             </div>
         </div>
     </div>
@@ -155,25 +153,25 @@
             searchInfo: {//请求参数
                 id:'',
                 name:'',
-                age: '',
-                phone:'',
-                address:'',
+                gender: '',
+                age:'',
+                mobile:'',
                 page: 1,
                 pageSize: 10
             },
             insertInfo: {
                 id: null,
                 name: '',
-                age: '',
-                phone:'',
-                address:''
+                gender: '',
+                age:'',
+                mobile:''
             },
             updateInfo: {
-                id: null,
+                id: '',
                 name:'',
-                age: '',
-                phone:'',
-                address:''
+                gender: '',
+                age:'',
+                mobile:''
             }
         },
         created: function () {
@@ -192,40 +190,33 @@
                 $('#pageMenu').page('destroy');//销毁分页
                 this.query();
             },
-            insertUser:function(user){
+            insertUser:function(){
                 $("#update-User").css("display","none");
                 $("#insert-User").css("display","block");
-                    this.insertInfo = {
-                        name: user.name,
-                        age:user.age,
-                        phone:user.phone,
-                        address:user.address
-                    }
             },
-            insertedUser:function(){
+            insertedUser:function(insertInfo){
                 var url = "/api/user/insert";
                 this.$http.post(url, this.insertInfo).then(function (response) {
                     sweetAlert("success");
                     this.query();
+                    $("#insert-User").css("display","none");
                 }, function (error) {
                     swal(error.body.msg);
                 });
             },
             updateUser : function(user){
-                $("#update-User").css("display","block");
                 $("#insert-User").css("display","none");
+                $("#update-User").css("display","block");
                 this.updateInfo = {
-                    name: user.name,
-                    age:user.age,
-                    phone:user.phone,
-                    address:user.address
+                    id: user.id
                 }
             },
-            updatedUser : function(){
+            updatedUser : function(updateInfo){
                 var url = "/api/user/update";
                 this.$http.post(url, this.updateInfo).then(function (response) {
                     sweetAlert("success");
                     this.query();
+                    $("#update-User").css("display","none");
                 }, function (error) {
                     swal(error.body.msg);
                 });
